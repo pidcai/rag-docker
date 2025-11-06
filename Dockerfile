@@ -1,24 +1,33 @@
-# Use Python 3.11 slim image as base
+# Use a lightweight Python Alpine image
 FROM python:3.14-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Set environment variables
+# Environment variables for Python
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install system dependencies if needed
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Install required system packages for building Python deps
+# (gcc, musl-dev, libffi-dev, openssl-dev, etc.)
+RUN apk add --no-cache \
+    bash \
+    curl \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    python3-dev \
+    build-base \
+    jpeg-dev \
+    zlib-dev
 
-# Copy requirements file
+# Copy requirements file first for layer caching
 COPY requirements.txt .
 
-# Upgrade pip and install Python dependencies
+# Upgrade pip and install dependencies
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
@@ -26,15 +35,16 @@ RUN pip install --upgrade pip && \
 COPY rag_pipeline.py .
 COPY streamlit_ui.py .
 
-# Copy .env file if it exists (optional - better to use docker-compose or pass env vars)
+# Copy .env file if present (optional)
 COPY .env* ./
 
 # Expose Streamlit default port
 EXPOSE 8501
 
-# Health check
+# Health check using curl
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-# Run Streamlit application
+# Default command to start Streamlit
 CMD ["streamlit", "run", "streamlit_ui.py", "--server.port=8501", "--server.address=0.0.0.0"]
+

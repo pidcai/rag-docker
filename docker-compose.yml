@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  streamlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rag-chatbot
+    ports:
+      - "8501:8501"
+    environment:
+      - COHERE_API_KEY=${COHERE_API_KEY}
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - VLLM_API_URL=${VLLM_API_URL}
+    volumes:
+      # Mount current directory for development (optional - comment out for production)
+      - .:/app
+    restart: unless-stopped
+    networks:
+      - app-network
+    # If your vLLM server is also in Docker, add this:
+    # depends_on:
+    #   - vllm-server
+
+networks:
+  app-network:
+    driver: bridge

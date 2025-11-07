@@ -1,8 +1,8 @@
 name: Streamlit RAG App CI/CD
 
 on:
-  #push:
-  #  branches: [ "main" ]
+  push:
+    branches: [ "main" ]
   #pull_request:
   #  branches: [ "main" ]
 
@@ -25,7 +25,7 @@ jobs:
   #  Security & Lint Scan Job
   # ====================================
   security-scan:
-    name: Security Scan (Trivy + Lint)
+    name: Security Scan (Sonar + pip audit)
     runs-on: ubuntu-latest
 
     steps:

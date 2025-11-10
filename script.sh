@@ -51,4 +51,3 @@ echo "Remaining rag-chatbot images:"
 sudo docker images | grep rag-chatbot || echo "None"
 
 # pull Docker image
-

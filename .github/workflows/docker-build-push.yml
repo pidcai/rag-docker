@@ -177,5 +177,3 @@ jobs:
             -e VLLM_API_URL \
             --restart unless-stopped \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:${{ env.IMAGE_TAG }}
-
-    
